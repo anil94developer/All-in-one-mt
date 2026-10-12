@@ -1,0 +1,178 @@
+{
+  "language": "ENG",
+  "lang": "ar",
+  "splash": {
+    "splash_title": "اغسل سيارتك أينما كنت"
+  },
+  "intro_screen": {
+    "slide_title1": "خدمة غسيل السيارات",
+    "slide_description1": "بيلنتيسكو سوسيبيت فرينجيلا ليبرو إيو ألامكوربر. كراس ريسوس إيروس",
+    "slide_title2": "خدمة غسيل السيارات",
+    "slide_description2": "خدمة غسيل السيارات بيلنتيسكو سوسيبيت فرينجيلا ليبرو إيو ألامكوربر. كراس ريسوس إيروس",
+    "slide_title3": "سوق تنظيف المركبات",
+    "slide_description3": "خدمة غسيل السيارات بيلنتيسكو سوسيبيت فرينجيلا ليبرو إيو ألامكوربر. كراس ريسوس إيروس",
+    "slide_title4": "خدمة غسيل السيارات الذاتي",
+    "slide_description4": "خدمة غسيل السيارات بيلنتيسكو سوسيبيت فرينجيلا ليبرو إيو ألامكوربر. كراس ريسوس إيروس",
+    "next": "التالي",
+    "skip": "تخطى"
+  },
+  "login_screen": {
+    "mobile_number": "رقم الهاتف المحمول",
+    "password": "كلمة المرور",
+    "remember_me": "تذكرني",
+    "forgot_password": "هل نسيت كلمة المرور؟",
+    "login": "تسجيل الدخول",
+    "sign_up": "إنشاء حساب",
+    "dont_have_an_account": "ليس لديك حساب؟"
+  },
+  "signup_screen": {
+    "full_name": "الاسم الكامل",
+    "speciality_name": "اسم التخصص",
+    "dealin": "التعامل في",
+    "PropertyDocuments": "وثائق الملكية",
+    "UploadDocuments": "تحميل المستندات",
+    "Products": "منتجات",
+    "email": "عنوان البريد الإلكتروني",
+    "whatsapp": "هل رقمك رقم WhatsApp؟",
+    "confirm_password": "تأكيد كلمة المرور",
+    "terms": "قبول الشروط والأحكام",
+    "already_account": "هل لديك حساب بالفعل؟",
+    "already_account_register": "هل لديك حساب؟"
+  },
+  "otp_screen": {
+    "otp": "التحقق من كلمة المرور الرقمية",
+    "receive_otp": "لم تتلقى كلمة المرور الرقمية؟",
+    "resend_otp": "إعادة إرسال كلمة المرور الرقمية",
+    "verify_otp": "التحقق من كلمة المرور الرقمية",
+    "account": "هل لديك حساب؟"
+  },
+  "subscription_screen": {
+    "title": "احصل على وصول غير محدود لبرامجنا.",
+    "sub_title": "اتخذ الخطوة الأولى نحو حياة صحية وسعيدة.",
+    "plan": "شائع"
+  },
+  "forgot_password": {
+    "send_otp": "إرسال كلمة المرور الرقمية"
+  },
+  "set_password": {
+    "set_pass": "تعيين كلمة المرور",
+    "new_pass": "كلمة مرور جديدة",
+    "re_enter_pass": "أعد إدخال كلمة المرور",
+    "save": "حفظ",
+    "change_password": "تغيير كلمة المرور؟"
+  },
+  "home_screen": {
+    "standard_plan": "الباقة القياسية",
+    "validDate": "صالح حتى",
+    "listYourCar": "اضف سيارتك",
+    "viewAll": "عرض الكل",
+    "bookNewWash": "حجز غسيل جديد",
+    "uncomingWash": "الغسيل القادم",
+    "featuredServices": "الخدمات المميزة",
+    "add": "إضافة",
+    "pin_address": "تثبيت العنوان",
+    "accept": "قبول",
+    "cancel": "إلغاء",
+    "more": "المزيد",
+    "available": "متاح",
+    "busy": "مشغول",
+    "not_available": "غير متاح",
+    "hold": "يتمسك!",
+    "back": "هل أنت متأكد أنك تريد العودة؟",
+    "cancels": "يلغي",
+    "yes": "نعم"
+  },
+  "car_list": {
+    "carList": "قائمة السيارات",
+    "addCar": "إضافة سيارة"
+  },
+  "car_brand": {
+    "carBrand": "ماركة السيارة",
+    "selectBrand": "اختر الماركة",
+    "next": "التالي"
+  },
+  "car_modal": {
+    "carModal": "موديل السيارة واللون",
+    "selectModal": "اختر الموديل",
+    "selectColor": "اختر اللون",
+    "carNumber": "رقم السيارة",
+    "next": "التالي"
+  },
+  "car_avatar": {
+    "carAvatar": "صورة السيارة",
+    "selectAvatar": "اختر صورة",
+    "save": "حفظ"
+  },
+  "setting": {
+    "change": "تغيير كلمة المرور",
+    "settings": "الإعدادات",
+    "delete_account": "حذف الحساب",
+    "log_out": "تسجيل الخروج",
+    "manage": "إدارة الإشعارات",
+    "how_it_works": "كيف يعمل",
+    "terms": "شروط الاستخدام",
+    "policy": "سياسة الخصوصية",
+    "version": "الإصدار الحالي للتطبيق",
+    "setting": "الإعدادات",
+    "user_lang": "اللغة",
+    "log": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+    "yes": "نعم",
+    "no": "لا"
+  },
+  "edit_screen": {
+    "full_name": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "date": "تاريخ الميلاد",
+    "gender": "الجنس",
+    "personal": "تفاصيل شخصية"
+  },
+  "notification_screen": {
+    "notification": "الإشعارات",
+    "mark_read": "وضع علامة مقروء الكل",
+    "mark_delete": "وضع علامة حذف الكل"
+  },
+  "order_screen": {
+    "order": "طلباتي",
+    "filter": "تصفية",
+    "search": "يبحث",
+    "filterjob": "تصفية الوظائف",
+    "duration": "مدة",
+    "from": "من",
+    "to": "ل",
+    "status": "حالة",
+    "all": "الجميع",
+    "active": "نشيط",
+    "complete": "مكتمل",
+    "cancel": "ألغيت",
+    "clear_filter": "مرشح واضح",
+    "apply": "يتقدم"
+  },
+  "tabs_screen": {
+    "home": "بيت",
+    "inventory": "جرد",
+    "notifications": "إشعار",
+    "profile": "حساب تعريفي",
+    "message": "رسالة"
+  },
+  "car_detail_screen": {
+    "service": "الخدمات المطلوبة",
+    "order_detail": "تفاصيل الطلب",
+    "time_left": "ثانية للإلغاء إذا كنت تريد.",
+    "can": "يلغي",
+    "rating": "آخر تقييم",
+    "pin": "عنوان الدبوس",
+    "confirm": "تأكيد الوظيفة",
+    "more": "أكثر",
+    "reach": "وصل",
+    "start": "إبدأ الخدمة",
+    "complete": "خدمة كاملة",
+    "otp_sent": "إرسال OTP إلى رقم هاتف العميل"
+  },
+  "quotes": {
+    "manageQuotes": "إدارة عروض الأسعار",
+    "requested": "مطلوب",
+    "received": "تلقى",
+    "requesetNew": "طلب عرض أسعار جديد"
+  }
+}

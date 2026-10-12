@@ -1,0 +1,558 @@
+{
+    "language": "POR",
+    "lang": "purtuguese",
+    "button": {
+        "logout_yes": "Sim",
+        "logout_no": "Não",
+        "logout": "Sair",
+        "logout_text": "Tem certeza que deseja sair",
+        "login_btn": "Conecte-se",
+        "send_btn": "Enviar",
+        "confirm_btn": "confirme",
+        "save_btn": "Salvar",
+        "register_new_asset_btn": "Cadastrar novo ativo",
+        "checkin_btn": "Check-in",
+        "checkout_btn": "Confira",
+        "run_maintenance_btn": "Executar manutenção",
+        "view_history_btn": "Ver histórico",
+        "open_new_wo_btn": "Abrir novo WO",
+        "rejct_btn": "Rejeitar",
+        "accept": "Aceitar",
+        "view_agenda_btn": "Ver agenda",
+        "new_date_btn": "Nova data",
+        "yes_btn": "Sim",
+        "no_btn": "Não",
+        "cancel_btn": "Cancelar",
+        "add_expense_btn": "Adicionar despesa",
+        "delete_btn": "Excluir",
+        "routine_checklist": "Rotina/lista de verificação",
+        "reschedule_btn": "Reprogramar",
+        "close_wo_btn": "Fechar WO",
+        "cancel_wo_btn": "Cancelar WO",
+        "delete_wo_btn": "Excluir OS",
+        "attached_file_btn": "Anexar arquivo",
+        "record_audio_btn": "Gravar audio",
+        "share_btn": "Compartilhar",
+        "transfer_btn": "Transferir",
+        "order_btn": "Ordem",
+        "apply_btn": "Aplicar",
+        "return_btn": "Retornar",
+        "cancel_order_btn": "Cancelar o pedido",
+        "returnto_stock_btn": "Retornar ao estoque",
+        "discard_btn": "Descartar",
+        "consumable_btn": "Consumível",
+        "good_btn": "Bom, não foi usado",
+        "bad_btn": "Ruim, chegou com defeito",
+        "collect_now_via_app-btn": "Colete agora (via aplicativo)",
+        "collect_later_via_portal-btn": "Colete mais tarde (via poprtal)",
+        "signature_btn": "Assinatura",
+        "go_to-wo-list_btn": "Ir para a lista WO",
+        "collect_sign_btn": "Coletar assinatura",
+        "home_btn": "Lar",
+        "ok_btn": "OK",
+        "finish_btn": "Terminar",
+        "whatsapp_btn":"Abra o WhatsApp"
+    },
+    "heading": {
+        "reset_password_screen": "Redefinir sua senha",
+        "enter_code_screen": "Insira seu código",
+        "new_password_screen": "Nova Senha",
+        "register_screen": "novo usuário",
+        "legal_person_screen": "Pessoa jurídica",
+        "question_suggestion_screen": "Perguntas e sugestões",
+        "recommend_us_screen": "Recomende-nos",
+        "about_us_screen": "Sobre este aplicativo",
+        "open_wo_screen": "Abrir WO",
+        "requester_screen": "Selecione o solicitante",
+        "select_service_screen": "Selecione o serviço",
+        "select_equipments_screen": "Selecione o equipamento",
+        "register_customer_screen": "Registro da empresa",
+        "register_assets_screen": "Registro de ativos",
+        "register_asset_photo_screen": "Fotos de ativos",
+        "time_loging_screen": "Registro de tempo",
+        "service_history_screen": "Histórico de serviço",
+        "option_screen": "Opções",
+        "wo_list_screen": "Lista de WO",
+        "notification_screen": "Notificações",
+        "expenses_list_screen": "Despesas diarias",
+        "activities_list_screen": "Lista de atividades",
+        "post_expenses_list_screen": "Lançar despesas",
+        "peventive_execution_screen": "Execução preventiva",
+        "wopicture_screen": "imagem WO",
+        "custom_field_screen": "Os campos personalizados",
+        "reminder_screen": "Lembrete",
+        "woinformation_screen": "Informações de OS",
+        "history_screen": "História",
+        "attached_file_screen": "Anexos",
+        "tasks_screen": "Tarefas",
+        "taskpicture_screen": "Imagens de tarefas",
+        "reschedule_screen": "Reprogramar WO",
+        "ask_for_help_screen": "Peça por ajuda",
+        "wo_share_screen": "Compartilhamento WO",
+        "wo_transfer_screen": "Transferência WO",
+        "base_knowledge_screen": "Conhecimento básico",
+        "corrective_execution_screen": "Execução corretiva",
+        "problem_cause_screen": "Problema/Causa/Solução",
+        "order_supply_screen": "Pedido de suprimentos",
+        "order_screen": "Ordem",
+        "requested_screen": "Requeridos",
+        "service_execution_screen": "Execução de serviço",
+        "wosignature_screen": "Assinatura OS",
+        "pending_signature_screen": "Assinaturas pendentes",
+        "listofInconsistencies_screen": "Lista de inconsistências"
+    },
+    "login_screen": {
+        "text": "simplificando a manutenção",
+        "email": "E-mail",
+        "company": "Empresa",
+        "password": "Senha",
+        "forgot_password": "Esqueceu sua senha",
+        "newuser": "Novo usuário?"
+    },
+    "reset_password_screen": {
+        "text": "Digite seu e-mail abaixo e lhe enviaremos um código para redefinir sua senha por e-mail/SMS",
+        "email": "E-mail"
+    },
+    "enter_code_screen": {
+        "text": "Digite o código de 6 dígitos recebido por Email/SMS",
+        "code": "Código",
+        "resend_otp": "Não recebi o e-mail/SMS!",
+        "model_text": "Verifique sua pasta de Spam e certifique-se de que seu e-mail esteja digitado corretamente. Se você não conseguir entrar em contato com o suporte técnico."
+    },
+    "new_password_screen": {
+        "text": "Digite sua nova senha abaixo",
+        "password": "Senha",
+        "repeat_password": "Repita a senha",
+        "model_text": "Sua senha foi alterada. Faça login novamente."
+    },
+    "register_screen": {
+        "full_name": "Nome completo",
+        "email": "E-mail",
+        "cell_phone": "Celular",
+        "password": "Senha",
+        "repeat_password": "Repita a senha",
+        "recommend": "Recomendado por",
+        "check_box_text": "Eu aceito o",
+        "check_box_text2": "Termos de uso",
+        "check_box_text3": "e",
+        "check_box_text4": "política de Privacidade"
+    },
+    "legal_person_screen": {
+        "ein": "EIN",
+        "corporate_name": "Razão social",
+        "address": "Endereço",
+        "number": "Número",
+        "complement": "Complemento",
+        "neighborhood": "Vizinhança",
+        "zipcode": "CEP",
+        "city": "Cidade",
+        "state": "Estado",
+        "country": "País"
+    },
+    "home_screen": {
+        "name": "Procurar",
+        "os": "SO hoje",
+        "total": "Total",
+        "colsed": "Fechada",
+        "remaining": "Restante",
+        "placeholder_company": "Empresa",
+        "search": "#EU IA"
+    },
+    "home_screen_model": {
+        "new_wo": "Novo Wo",
+        "wo_list/schedule": "Lista/Programação de WO",
+        "register_customer": "Cadastrar cliente ou ativo",
+        "solution_base": "Base de solução",
+        "pending_signature": "Assinatura pendente",
+        "time_logging": "Registro de tempo",
+        "expenses": "Despesas",
+        "iot_sensor_menu": "Manual do sensor IoT"
+    },
+    "drawer_screen": {
+        "question": "Converse conosco",
+        "recommend": "Recomende-nos",
+        "about": "Sobre este aplicativo",
+        "light/darkmode": "Modo claro/escuro",
+        "log_out": "Sair"
+    },
+    "question_suggestion_screen": {
+        "text": "Descreva sua pergunta ou sugestão de continuação e converse conosco via WhatsApp.",
+        "your_name": "Seu nome",
+        "your_question": "Sua pergunta"
+    },
+    "recommend_us_screen": {
+        "text": "Agradecemos antecipadamente pela sua recomendação.",
+        "text2": "Conheça nosso programa de parceria em",
+        "text3": "www.manu2b.com/seja-um-parcriro/",
+        "contact_name": "Nome de contato",
+        "company": "Empresa",
+        "email": "E-mail",
+        "phone_number": "Telefone da empresa ou contato"
+    },
+    "about_us_screen": {
+        "text1": "Programas: Aplicativo Manu2b",
+        "text2": "Versão:",
+        "text3": "E-mail: sales@manu2b.com",
+        "text4": "Site: www.manu2b.com",
+        "text5": "Copyright@2024 todos os direitos de propriedade intelectual deste APP, incluindo gráficos, imagens, fluxo operacional e textos pertencem à EC Plus Desenvolvimento de Sistemas Ltda."
+    },
+    "open_wo_screen": {
+        "company/person": "Empresa/Pessoa",
+        "search": "ETIQUETA/ID#",
+        "tag_info": "Informações da etiqueta",
+        "comapny": "Empresa:",
+        "active": "ID/TAG ativo#:",
+        "type": "Tipo:",
+        "location": "Localização:",
+        "model": "Modelo:",
+        "prioroty": "Prioridade",
+        "maintenance_type": "Tipo de manutenção",
+        "description": "Descrição",
+        "custom_field": "Os campos personalizados...",
+        "requester": "Solicitante",
+        "equipment": "Equipamento",
+        "service": "Serviço"
+    },
+    "requester_screen": {
+        "requester": "Solicitante",
+        "full_name": "Nome completo",
+        "email": "E-mail",
+        "cell_phone": "Celular",
+        "text": "O novo solicitante receberá um e-mail com credenciais e instruções para acessar a plataforma",
+        "so_and_so": "fulano de tal",
+        "beltrano": "Dental Beltron",
+        "Tal_cyclane": "Tal Ciclano"
+    },
+    "select_service_screen": {
+        "service": "Serviço",
+        "bathroom_cleaning": "Limpeza de banheiro",
+        "pipe_repair": "Reparação de tubos",
+        "switch_replacement": "Substituição"
+    },
+    "select_equipments_screen": {
+        "equipment": "Equipamento",
+        "split01": "DIVIDIR01",
+        "split67": "DIVIDIR67",
+        "vrf_hc": "VRF HC0345"
+    },
+    "register_customer_screen": {
+        "comapny_name": "nome da empresa",
+        "address": "Endereço",
+        "number": "Número",
+        "complement": "Complemento",
+        "neighborhood": "Vizinhança",
+        "city": "Cidade",
+        "state": "Estado",
+        "country": "País",
+        "contact": "Contato",
+        "email": "E-mail",
+        "phone": "Telefone",
+        "custom_field": "Os campos personalizados..."
+    },
+    "register_assets_screen": {
+        "company": "Empresa",
+        "modality": "Modalidade/Tipo de ativo",
+        "status": "Status",
+        "situation": "Situação",
+        "model": "Modelo",
+        "physical_location": "Localização física",
+        "id/tag": "ID/Etiqueta",
+        "auto_id": "ID automático",
+        "custom_field": "Os campos personalizados..."
+    },
+    "register_asset_photo_screen": {
+        "subtitle": "Legenda"
+    },
+    "time_loging_screen": {
+        "text": "pronto para iniciar suas atividades diárias?"
+    },
+    "service_history_screen": {
+        "search": "procurar",
+        "os": "SO#:",
+        "requester": "Solicitante:",
+        "location": "Localização:",
+        "defect": "Defeito:",
+        "parts": "Peças:",
+        "opening_date": "Data de abertura:",
+        "start_date": "Data de início:",
+        "end_date": "Data final:"
+    },
+    "option_screen": {
+        "company": "Empresa:",
+        "activeid": "ID/TAG ativo#:",
+        "description": "Descrição:",
+        "equipment_type": "Tipo de equipamento:",
+        "location": "Localização:",
+        "criticality": "Criticamente:",
+        "contract_until": "Contrato_até:",
+        "last_pm": "Última PM em:",
+        "last_mc": "Último MC em:"
+    },
+    "wo_list_screen": {
+        "search": "procurar"
+    },
+    "notification_screen": {
+        "all": "Todos",
+        "today": "Hoje",
+        "week": "Semana",
+        "month": "Mês"
+    },
+    "all_screen": {
+        "search": "procurar",
+        "pending": "Pendente",
+        "closed": "Fechado"
+    },
+    "all_screen_model": {
+        "wo": "WO#:",
+        "id": "EU IA#",
+        "active": "Ativo:",
+        "opening_date": "Data de abertura:",
+        "response_time": "Tempo de resposta:",
+        "description": "Descrição:",
+        "notification": "Notificação:",
+        "model_heading1": "A chamada foi enviada para:",
+        "model_heading2": "O serviço estava agendado para:",
+        "model_heading3": "A data sugerida: DD/MM/AA",
+        "model_heading4": "Tem certeza de que deseja rejeitar esta chamada? será direto para:"
+    },
+    "expenses_list_screen": {
+        "category": "Categoria",
+        "date": "Data",
+        "description": "Descrição",
+        "value": "Valor"
+    },
+    "activities_list_screen": {
+        "search": "procurar",
+        "os": "SO#:",
+        "activities": "Atividades:"
+    },
+    "peventive_execution_screen": {
+        "info": "Informações",
+        "history": "História",
+        "reminder": "Lembrete",
+        "fields": "Campos",
+        "parts": "Peças",
+        "service_performed": "Serviço realizado",
+        "comments": "Comentários"
+    },
+    "peventive_execution_screen_model": {
+        "reschedule_service": "Reagendar serviço",
+        "ask_for_help": "Peça por ajuda",
+        "share_wo": "Compartilhar WO",
+        "transfer_wo": "Ttransferir AGORA",
+        "search_for_solution": "Procure por solução"
+    },
+    "wopicture_screen": {
+        "subtitle": "Legenda"
+    },
+    "custom_field_screen": {
+        "justification": "Justificação"
+    },
+    "reminder_screen": {
+        "description": "Descrição"
+    },
+    "woinformation_screen": {
+        "company": "Empresa:",
+        "unit": "Unidade:",
+        "activeid": "ID/TAG ativo#:",
+        "description": "Descrição:",
+        "equipment_type": "Tipo de equipamento:",
+        "location": "Localização:",
+        "criticality": "Criticamente:",
+        "contract_until": "Contrato_até:",
+        "last_pm": "Última PM em:",
+        "last_mc": "Último MC em:",
+        "os": "SO:",
+        "requester": "Solicitante:",
+        "defect": "Defeito:",
+        "opening_date": "Data de abertura:"
+    },
+    "history_screen": {
+        "current_activity": "Atividade atual",
+        "previous_wo": "WO anterior"
+    },
+    "previous_screen": {
+        "search": "procurar",
+        "os": "SO#:",
+        "requester": "Solicitante:",
+        "location": "Localização:",
+        "defect": "Defeito:",
+        "parts": "Peças:",
+        "opening_date": "Data de abertura:",
+        "start_date": "Data de início:",
+        "end_date": "Data final:"
+    },
+    "attached_file_screen": {},
+    "tasks_screen": {
+        "justification": "Justificação"
+    },
+    "taskpicture_screen": {
+        "subtitle": "Legenda"
+    },
+    "ask_for_help_screen": {
+        "client": "Cliente:",
+        "id": "EU IA#",
+        "asset": "Ativo",
+        "model": "Modelo:",
+        "location": "Localização:",
+        "problem_description": "Descrição do Problema"
+    },
+    "wo_share_screen": {
+        "select_person": "Selecione a pessoa",
+        "message": "Mensagem"
+    },
+    "wo_transfer_screen": {
+        "select_person": "Selecione a pessoa",
+        "message": "Mensagem"
+    },
+    "base_knowledge_screen": {
+        "Describe": "Descreva o problema",
+        "equipment_data": "Dados do equipamento",
+        "manufacture_brand": "Fabricante/Marca:",
+        "modality": "Modalidade:",
+        "equipment": "Equipamento:",
+        "model": "Modelo:",
+        "serial_number": "Número de série:",
+        "customer_defect": "Defeito do cliente",
+        "possible_solution": "Solução possível",
+        "text": "002 soluções possíveis foram encontradas:",
+        "success": "sucesso",
+        "solution1": "Solução 1:",
+        "solution2": "Solução 2:"
+    },
+    "corrective_execution_screen": {
+        "info": "Informações",
+        "history": "História",
+        "reminder": "Lembrete",
+        "fields": "Campos",
+        "pcs": "PCS",
+        "parts": "Peças",
+        "asset_failure": "Falha de ativo",
+        "asset_status": "Status do ativo",
+        "service_performed": "Serviço realizado",
+        "comments": "Comentários"
+    },
+    "corrective_execution_screen_model": {
+        "reschedule_service": "Reagendar serviço",
+        "ask_for_help": "Peça por ajuda",
+        "share_wo": "Compartilhar WO",
+        "transfer_wo": "Ttransferir AGORA",
+        "search_for_solution": "Procure por solução"
+    },
+    "run_corrective_screen_model": {
+        "training": "Treinamento de IA",
+        "problem": "Problema",
+        "cause": "Causa",
+        "solution": "Solução"
+    },
+    "problem_cause_screen": {
+        "solution_id": "ID da solução:",
+        "os": "SO:",
+        "service_performed": "Serviço realizado:",
+        "parts": "Peças:",
+        "solution": "Solução:",
+        "case": "Caso:",
+        "solution_level": "Nível de solução:",
+        "text": "Essa sugestão foi responsável pela solução do problema?"
+    },
+    "problem_cause_screen_model": {
+        "model_text1": "Sua solução foi inserida com sucesso no banco de dados e melhorou o conhecimento de IA.Obrigado!!"
+    },
+    "order_screen": {
+        "category": "Categoria",
+        "warehouse": "Armazém",
+        "search": "Pesquise por nome, descrição ou p#",
+        "product": "Produtos:",
+        "part": "Papel#:",
+        "description": "Descrição:",
+        "available_quantity": "Quantidade disponível:"
+    },
+    "order_screen_model": {
+        "qty": "Quantidade",
+        "product": "produtos:",
+        "part": "Papel#:",
+        "description": "Descrição:",
+        "available_quantity": "Quantidade disponível:"
+    },
+    "requested_screen": {
+        "product": "Produtos:",
+        "order_date": "Data do pedido:",
+        "status": "Status:",
+        "quantity_ordered": "Quantidade encomendada:",
+        "remaining": "Restante:",
+        "use": "Usar:",
+        "unit": "Unidade:",
+        "requested_quantity": "Quantidade solicitada:",
+        "current_volume": "Volume atual:",
+        "volume_used": "Volume usado:",
+        "remaining_volume": "Volume restante:"
+    },
+    "requested_screen_model": {
+        "text": "Você encomendou com sucesso a seguinte peça!",
+        "text2": "Atenção!",
+        "text3": "Você confirma o uso do seguinte material?",
+        "text4": "A parte do pedido () foi aplicada!",
+        "text5": "A parte restante deverá ser devolvida ao estoque para recuperação!",
+        "text6": "Você confirma o retorno ao estoque do seguinte material",
+        "text7": "A condição deste material é:",
+        "text8": "Você confirma o cancelamento de toda parte deste pedido?",
+        "text9": "** Isso só é possível se o supervisor ainda não tiver aprovado o pedido.",
+        "vol": "Vol.",
+        "unit": "Unidade",
+        "kg": "Kg",
+        "qty": "Quantidade",
+        "product": "Produtos:",
+        "order_date": "Data do pedido:",
+        "status": "Status:",
+        "quantity_return": "Quantidade a devolver:",
+        "quantity_ordered": "Quantidade encomendada:",
+        "remaining": "Restante:"
+    },
+    "service_execution_screen": {
+        "info": "Informações",
+        "history": "História",
+        "reminder": "Lembrete",
+        "fields": "Campos",
+        "pcs": "PCS",
+        "parts": "Peças",
+        "service_type": "Tipo de serviço",
+        "service_performed": "Serviço realizado",
+        "comments": "Comentários"
+    },
+    "service_execution_screen_model": {
+        "collect_sign": "Coletar assinatura",
+        "send_by_email": "Enviar WO por e-mail?",
+        "email": "E-mail"
+    },
+    "wosignature_screen": {
+        "call_opening": "Dados de abertura de chamada",
+        "company": "Empresa:",
+        "unit": "Unidade:",
+        "activeid": "ID/TAG ativo#:",
+        "location": "Localização:",
+        "prioroty": "Prioridade:",
+        "requester": "Solicitante:",
+        "opening_date_time": "Data/hora de abertura:",
+        "demand": "Demanda:",
+        "call_closing": "Dados de fechamento de chamada",
+        "responsible_technician": "Técnico responsável:",
+        "start_date_time": "Data/hora de início:",
+        "end_date_time": "Data/hora de término:",
+        "time_worked": "Tempo trabalhado:",
+        "service_performed": "Serviço realizado:",
+        "part_replaced": "Peças substituídas:",
+        "service_evaluation": "Avaliação de serviço",
+        "comments": "Comentários"
+    },
+    "pending_signature_screen": {},
+    "thanks_screen": {
+        "text": "Esta ordem de serviço foi concluída.",
+        "text2": "O que você quer fazer agora?"
+    },
+    "listofInconsistencies_screen": {
+        "os": "SO:",
+        "client": "Cliente:",
+        "id": "EU IA:",
+        "error": "Erro:"
+    }
+}
