@@ -8,6 +8,7 @@ import {
   StatusBar,
   ScrollView,
   TextInput,
+  Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
@@ -23,6 +24,7 @@ import { gameList1, gameList3, gameList4, gameList5 } from '../../enums/panaList
 
 export default function StarlineBidScreen(props) {
   const insets = useSafeAreaInsets();
+  const bottomInset = Platform.OS === 'android' ? Math.max(insets.bottom + 12, 68) : (insets.bottom > 0 ? insets.bottom + 12 : 16);
   const { strings } = useLanguage();
   const { market = { time: '7:05 PM', id: 's11' }, gameType = 'Double Pana' } =
     props.route.params || {};
@@ -217,7 +219,7 @@ export default function StarlineBidScreen(props) {
       <View style={styles.bodyWrapper}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: 90 + insets.bottom }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 130 + bottomInset }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -329,7 +331,7 @@ export default function StarlineBidScreen(props) {
       </ScrollView>
 
       {/* BOTTOM FOOTER BAR */}
-      <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+      <View style={[styles.bottomBar, { paddingBottom: bottomInset, paddingTop: 12 }]}>
         <View style={styles.bottomCol}>
           <Text style={styles.bottomLabel}>{strings.bids_count_label || 'Bids'}</Text>
           <Text style={styles.bottomValRed}>{bidsList.length}</Text>
@@ -563,12 +565,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FDECEF',
     borderTopWidth: 1,
     borderTopColor: '#FECDD3',
-    paddingVertical: 10,
+    paddingTop: 12,
     paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    elevation: 8,
+    elevation: 16,
+    zIndex: 999,
   },
   bottomCol: {
     alignItems: 'center',

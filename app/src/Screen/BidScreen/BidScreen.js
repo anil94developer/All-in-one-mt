@@ -11,6 +11,7 @@ import {
     FlatList,
     TextInput,
     Dimensions,
+    Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
@@ -108,6 +109,7 @@ const QUICK_AMOUNTS = [10, 50, 100, 200, 500, 1000];
 
 export default function BidScreen(props) {
     const insets = useSafeAreaInsets();
+    const bottomInset = Platform.OS === 'android' ? Math.max(insets.bottom + 12, 68) : (insets.bottom > 0 ? insets.bottom + 12 : 16);
     const { strings } = useLanguage();
     const { details = {}, selectItem = {}, status = true } = props.route?.params || {};
 
@@ -412,6 +414,7 @@ export default function BidScreen(props) {
         details,
         selectItem,
         refreshWallet: fetchWallet,
+        bottomInset,
     };
 
     return (
@@ -486,7 +489,7 @@ export default function BidScreen(props) {
                 <View style={styles.fallbackContainer}>
                     <ScrollView
                         style={styles.formScroll}
-                        contentContainerStyle={[styles.formContent, { paddingBottom: 100 + insets.bottom }]}
+                        contentContainerStyle={[styles.formContent, { paddingBottom: 130 + bottomInset }]}
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="handled"
                     >
@@ -830,7 +833,7 @@ export default function BidScreen(props) {
 
                     {/* Sticky Bottom Action Bar */}
                     {bidData.length > 0 && (
-                        <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+                        <View style={[styles.bottomBar, { paddingBottom: bottomInset, paddingTop: 12 }]}>
                             <View style={styles.bottomSummaryCol}>
                                 <Text style={styles.bottomSummaryLabel}>TOTAL BIDS</Text>
                                 <Text style={styles.bottomSummaryVal}>{bidData.length}</Text>
@@ -1208,11 +1211,12 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#1A3358',
         paddingHorizontal: 16,
-        paddingVertical: 10,
+        paddingTop: 12,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        elevation: 10,
+        elevation: 16,
+        zIndex: 999,
     },
     bottomSummaryCol: {
         alignItems: 'flex-start',

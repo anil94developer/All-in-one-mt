@@ -5,6 +5,7 @@ import api from '../../utils/api';
 import DataTable from '../../components/common/DataTable';
 import SupportChatAdmin from '../../components/admin/SupportChatAdmin';
 import GaliDesawarAdmin from '../../components/admin/GaliDesawarAdmin';
+import StarlineAdmin from '../../components/admin/StarlineAdmin';
 import {
   SINGLE_DIGITS,
   JODI_DIGITS,
@@ -87,6 +88,7 @@ const AdminDashboard = ({ setAdminAuth }) => {
   const [openMenus, setOpenMenus] = useState({
     commission: true,
     gali: false,
+    starline: false,
     reports: false,
     wallet: false,
     games: false,
@@ -98,6 +100,8 @@ const AdminDashboard = ({ setAdminAuth }) => {
   useEffect(() => {
     if (activeTab.startsWith('gali_')) {
       setOpenMenus(prev => ({ ...prev, gali: true }));
+    } else if (activeTab.startsWith('starline_')) {
+      setOpenMenus(prev => ({ ...prev, starline: true }));
     } else if (['user_commission', 'user_commission_pay_list'].includes(activeTab)) {
       setOpenMenus(prev => ({ ...prev, commission: true }));
     } else if (['bid_history_report', 'customer_sell_report', 'winning_report', 'transfer_report', 'withdraw_report', 'add_fund_report', 'report_bid_history', 'report_sell', 'report_winning', 'report_transfer', 'report_bid_win', 'report_withdraw', 'report_auto_deposit', 'report_add_fund', 'winning_prediction'].includes(activeTab)) {
@@ -2291,6 +2295,39 @@ const AdminDashboard = ({ setAdminAuth }) => {
                   Sell / Risk Report
                 </div>
                 <div onClick={() => setActiveTab('gali_rates')} style={submenuItemStyle(activeTab === 'gali_rates')}>
+                  Game Rates
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* StarLine Management (Collapsible) */}
+          <div>
+            <div onClick={() => toggleMenu('starline')} style={sidebarItemStyle(activeTab.startsWith('starline_'))}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '1.1rem' }}>⭐</span>
+                <span>StarLine Management</span>
+              </div>
+              <span style={{ fontSize: '0.75rem' }}>{openMenus.starline ? '▾' : '▸'}</span>
+            </div>
+            {openMenus.starline && (
+              <div>
+                <div onClick={() => setActiveTab('starline_games')} style={submenuItemStyle(activeTab === 'starline_games')}>
+                  Game List
+                </div>
+                <div onClick={() => setActiveTab('starline_declare_result')} style={submenuItemStyle(activeTab === 'starline_declare_result')}>
+                  Declare Result
+                </div>
+                <div onClick={() => setActiveTab('starline_bid_history')} style={submenuItemStyle(activeTab === 'starline_bid_history')}>
+                  User Bet List
+                </div>
+                <div onClick={() => setActiveTab('starline_win_history')} style={submenuItemStyle(activeTab === 'starline_win_history')}>
+                  Winning Report
+                </div>
+                <div onClick={() => setActiveTab('starline_sell_report')} style={submenuItemStyle(activeTab === 'starline_sell_report')}>
+                  Sell / Risk Report
+                </div>
+                <div onClick={() => setActiveTab('starline_rates')} style={submenuItemStyle(activeTab === 'starline_rates')}>
                   Game Rates
                 </div>
               </div>
@@ -7116,6 +7153,11 @@ const AdminDashboard = ({ setAdminAuth }) => {
           {/* VIEW: GALI DESAWAR OPERATIONS */}
           {activeTab.startsWith('gali_') && (
             <GaliDesawarAdmin activeTab={activeTab} setActiveTab={setActiveTab} />
+          )}
+
+          {/* VIEW: STARLINE OPERATIONS */}
+          {activeTab.startsWith('starline_') && (
+            <StarlineAdmin activeTab={activeTab} setActiveTab={setActiveTab} />
           )}
 
           {/* VIEW: DECLARE RESULT */}

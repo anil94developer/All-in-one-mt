@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     TextInput,
     ActivityIndicator,
+    Platform,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Dialog } from '../../context/DialogContext';
@@ -22,6 +23,7 @@ export default function SPMotor({
     submit_bid,
     loading = false,
     status = true,
+    bottomInset = Platform.OS === 'android' ? 68 : 16,
 }) {
     const [digitId, setDigitId] = useState('');
     const [points, setPoints] = useState('10');
@@ -146,7 +148,7 @@ export default function SPMotor({
         <View style={styles.container}>
             <ScrollView
                 style={styles.scroll}
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[styles.scrollContent, { paddingBottom: 130 + bottomInset }]}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
             >
@@ -315,7 +317,7 @@ export default function SPMotor({
 
             {/* Sticky Bottom Action Bar */}
             {bidData.length > 0 && (
-                <View style={styles.bottomBar}>
+                <View style={[styles.bottomBar, { paddingBottom: bottomInset, paddingTop: 12 }]}>
                     <View style={styles.bottomCol}>
                         <Text style={styles.bottomLabel}>TOTAL BIDS</Text>
                         <Text style={styles.bottomVal}>{bidData.length}</Text>
@@ -566,11 +568,12 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#1A3358',
         paddingHorizontal: 16,
-        paddingVertical: 10,
+        paddingTop: 12,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        elevation: 10,
+        elevation: 16,
+        zIndex: 999,
     },
     bottomCol: {
         alignItems: 'flex-start',

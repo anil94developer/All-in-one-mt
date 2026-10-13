@@ -183,6 +183,99 @@ exports.toggleGameStatus = async (req, res) => {
 // 2. ADMIN: RESULT DECLARE & WIN/LOSS SETTLEMENT
 // ==========================================
 
+// POST /api/admin/gali-desawar/declare-result/preview
+exports.previewWinners = async (req, res) => {
+  try {
+    const { game_name, result_date, declare_result } = req.body;
+    if (!game_name || !result_date || declare_result === undefined || declare_result === null || String(declare_result).trim() === '') {
+      return res.status(400).json({ success: '0', msg: 'Game name, date, and 2-digit result are required' });
+    }
+
+    const rawNum = String(declare_result).trim();
+    if (isNaN(rawNum) || rawNum.length < 1 || rawNum.length > 2) {
+      return res.status(400).json({ success: '0', msg: 'Result must be a 1 or 2 digit number (e.g., 05, 73)' });
+    }
+
+    const formattedResult = rawNum.padStart(2, '0');
+    const leftDigit = formattedResult[0];
+    const rightDigit = formattedResult[1];
+
+    // 1. Fetch Rates for Left Digit, Right Digit, and Jodi
+    const [rateRows] = await db.query('SELECT * FROM galidisswar_game_rates WHERE status = 1');
+    const rateMap = {
+      'Left Digit': 9.5,
+      'Right Digit': 9.5,
+      'Jodi Digit': 95,
+    };
+    rateRows.forEach((r) => {
+      const min = parseFloat(r.min_value) || 10;
+      const max = parseFloat(r.max_value) || (r.game_type === 'Jodi Digit' ? 950 : 95);
+      rateMap[r.game_type] = max / min;
+    });
+
+    // 2. Query Pending Bids for this Game and Date
+    const [bids] = await db.query(
+      `SELECT * FROM galidisswar_bid_history 
+       WHERE TRIM(game_name) = TRIM(?) AND date = ? AND (status = 'pending' OR status IS NULL OR status = '')`,
+      [game_name.trim(), result_date]
+    );
+
+    const winners = [];
+    let totalWinningAmount = 0;
+
+    for (const bid of bids) {
+      const bidDigit = String(bid.digit || '').trim();
+      const bidPoints = parseFloat(bid.points) || 0;
+      const gType = (bid.game_type || '').trim();
+      let isWin = false;
+      let multiplier = 9.5;
+
+      if (gType.toLowerCase().includes('left')) {
+        isWin = (bidDigit === leftDigit);
+        multiplier = rateMap['Left Digit'] || 9.5;
+      } else if (gType.toLowerCase().includes('right')) {
+        isWin = (bidDigit === rightDigit);
+        multiplier = rateMap['Right Digit'] || 9.5;
+      } else if (gType.toLowerCase().includes('jodi')) {
+        isWin = (bidDigit === formattedResult);
+        multiplier = rateMap['Jodi Digit'] || 95;
+      }
+
+      if (isWin && bidPoints > 0) {
+        const winAmount = Math.round(bidPoints * multiplier);
+        totalWinningAmount += winAmount;
+        winners.push({
+          bid_id: bid.id,
+          username: bid.username,
+          game_name: bid.game_name,
+          game_type: gType,
+          digit: bidDigit,
+          points: bidPoints,
+          multiplier,
+          win_amount: winAmount,
+          date: bid.date
+        });
+      }
+    }
+
+    return res.json({
+      success: '1',
+      data: {
+        total_bids: bids.length,
+        winners_count: winners.length,
+        total_winning_amount: totalWinningAmount,
+        declared_result: formattedResult,
+        left_digit: leftDigit,
+        right_digit: rightDigit,
+        winners
+      }
+    });
+  } catch (err) {
+    console.error('Error in galiDesawar.previewWinners:', err);
+    return res.status(500).json({ success: '0', error: err.message });
+  }
+};
+
 // POST /api/admin/gali-desawar/declare-result
 exports.declareResult = async (req, res) => {
   const { game_name, result_date, declare_result } = req.body;
@@ -240,7 +333,7 @@ exports.declareResult = async (req, res) => {
     // 3. Process Pending Bids for this Game and Date
     const [pendingBids] = await db.query(
       `SELECT * FROM galidisswar_bid_history 
-       WHERE TRIM(game_name) = TRIM(?) AND date = ? AND status = 'pending'`,
+       WHERE TRIM(game_name) = TRIM(?) AND date = ? AND (status = 'pending' OR status IS NULL OR status = '')`,
       [game_name, result_date]
     );
 
@@ -285,8 +378,8 @@ exports.declareResult = async (req, res) => {
         await db.query(
           `INSERT INTO galidisswar_winning_report 
            (username, bid_id, game_name, game_type, session, open_pana, open_digit, close_pana, close_digit, points_action, digit, winning_points, date) 
-           VALUES (?, ?, ?, ?, 'Close', 'NA', ?, 'NA', ?, 1, ?, ?, ?)`,
-          [phone, bid.id, game_name, gType, leftDigit, rightDigit, bidDigit, winAmount, result_date]
+           VALUES (?, ?, ?, ?, 'Close', 'NA', ?, 'NA', ?, ?, ?, ?, ?)`,
+          [phone, bid.id, game_name, gType, leftDigit, rightDigit, bidPoints, bidDigit, winAmount, result_date]
         );
 
         // C. Insert into wallet_history
@@ -349,6 +442,35 @@ exports.getResultsList = async (req, res) => {
     return res.json({ success: '1', data: rows });
   } catch (err) {
     console.error('Error in getResultsList:', err);
+    return res.status(500).json({ success: '0', error: err.message });
+  }
+};
+
+// GET /api/admin/gali-desawar/results/:id/winners
+exports.getWinnersForResult = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [[resultRecord]] = await db.query('SELECT * FROM galidisswar_result_history WHERE id = ?', [id]);
+    if (!resultRecord) {
+      return res.status(404).json({ success: '0', msg: 'Result record not found' });
+    }
+
+    const [winners] = await db.query(
+      `SELECT * FROM galidisswar_winning_report 
+       WHERE TRIM(game_name) = TRIM(?) AND date = ? 
+       ORDER BY id DESC`,
+      [resultRecord.game_name, resultRecord.result_date]
+    );
+
+    return res.json({
+      success: '1',
+      data: {
+        result: resultRecord,
+        winners
+      }
+    });
+  } catch (err) {
+    console.error('Error in galiDesawar.getWinnersForResult:', err);
     return res.status(500).json({ success: '0', error: err.message });
   }
 };
@@ -465,6 +587,92 @@ exports.getAdminBidHistory = async (req, res) => {
     });
   } catch (err) {
     console.error('Error in getAdminBidHistory:', err);
+    return res.status(500).json({ success: '0', error: err.message });
+  }
+};
+
+// PUT /api/admin/gali-desawar/bids/:id (Edit Bet)
+exports.updateAdminBid = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { digit, points, game_type, status } = req.body;
+
+    const [[existing]] = await db.query('SELECT * FROM galidisswar_bid_history WHERE id = ?', [id]);
+    if (!existing) {
+      return res.status(404).json({ success: '0', msg: 'Bet record not found' });
+    }
+
+    const cleanDigit = digit !== undefined ? String(digit).trim() : existing.digit;
+    const cleanPoints = points !== undefined ? parseFloat(points) || 0 : existing.points;
+    const cleanGameType = game_type !== undefined ? String(game_type).trim() : existing.game_type;
+    const cleanStatus = status !== undefined ? String(status).trim() : existing.status;
+
+    await db.query(
+      `UPDATE galidisswar_bid_history 
+       SET digit = ?, 
+           points = ?, 
+           game_type = ?, 
+           status = ? 
+       WHERE id = ?`,
+      [cleanDigit, cleanPoints, cleanGameType, cleanStatus, id]
+    );
+
+    return res.json({ success: '1', msg: 'Bet updated successfully' });
+  } catch (err) {
+    console.error('Error in galiDesawar.updateAdminBid:', err);
+    return res.status(500).json({ success: '0', error: err.message });
+  }
+};
+
+// DELETE /api/admin/gali-desawar/bids/:id (Delete Bet with optional refund)
+exports.deleteAdminBid = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { refund } = req.body || {};
+
+    const [[bid]] = await db.query('SELECT * FROM galidisswar_bid_history WHERE id = ?', [id]);
+    if (!bid) {
+      return res.status(404).json({ success: '0', msg: 'Bet record not found' });
+    }
+
+    // Process refund if requested and points > 0
+    if (refund && parseFloat(bid.points) > 0) {
+      const refundAmt = parseFloat(bid.points);
+      const phone = bid.username;
+      await db.query('UPDATE user_info SET wallet = wallet + ? WHERE phone = ?', [refundAmt, phone]);
+
+      const [[uRow]] = await db.query('SELECT wallet FROM user_info WHERE phone = ?', [phone]);
+      const updatedBal = uRow ? uRow.wallet : 0;
+
+      const nowIST = getISTDate();
+      try {
+        await db.query(
+          `INSERT INTO wallet_history 
+           (status, date, time, amount, updated_amount, remark, phone_number) 
+           VALUES ('1', ?, ?, ?, ?, ?, ?)`,
+          [
+            getFormattedISTDate(nowIST),
+            nowIST.toTimeString().slice(0, 8),
+            refundAmt,
+            updatedBal,
+            `Gali Desawar Bet Refund: ${bid.game_name} (${bid.game_type} - ${bid.digit})`,
+            phone
+          ]
+        );
+      } catch (we) {
+        console.error('Error recording refund wallet history:', we);
+      }
+    }
+
+    // Also remove from winning report if it was marked won
+    try {
+      await db.query('DELETE FROM galidisswar_winning_report WHERE bid_id = ?', [id]);
+    } catch (dwe) {}
+
+    await db.query('DELETE FROM galidisswar_bid_history WHERE id = ?', [id]);
+    return res.json({ success: '1', msg: 'Bet deleted successfully' });
+  } catch (err) {
+    console.error('Error in galiDesawar.deleteAdminBid:', err);
     return res.status(500).json({ success: '0', error: err.message });
   }
 };

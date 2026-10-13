@@ -184,14 +184,43 @@ router.put('/gali-desawar/games/:id', verifyAdmin, galiDesawarController.updateA
 router.delete('/gali-desawar/games/:id', verifyAdmin, galiDesawarController.deleteAdminGame);
 router.post('/gali-desawar/games/toggle', verifyAdmin, galiDesawarController.toggleGameStatus);
 
+router.post('/gali-desawar/declare-result/preview', verifyAdmin, galiDesawarController.previewWinners);
 router.post('/gali-desawar/declare-result', verifyAdmin, galiDesawarController.declareResult);
 router.get('/gali-desawar/results', verifyAdmin, galiDesawarController.getResultsList);
+router.get('/gali-desawar/results/:id/winners', verifyAdmin, galiDesawarController.getWinnersForResult);
 router.delete('/gali-desawar/results/:id', verifyAdmin, galiDesawarController.revertResult);
 
 router.get('/gali-desawar/bids', verifyAdmin, galiDesawarController.getAdminBidHistory);
+router.put('/gali-desawar/bids/:id', verifyAdmin, galiDesawarController.updateAdminBid);
+router.delete('/gali-desawar/bids/:id', verifyAdmin, galiDesawarController.deleteAdminBid);
 router.get('/gali-desawar/wins', verifyAdmin, galiDesawarController.getAdminWinHistory);
 router.get('/gali-desawar/sell-report', verifyAdmin, galiDesawarController.getAdminSellReport);
 router.get('/gali-desawar/rates', verifyAdmin, galiDesawarController.getGaliRates);
 router.post('/gali-desawar/rates', verifyAdmin, galiDesawarController.updateGaliRates);
 
+// Starline Admin Endpoints
+const starlineController = require('../controllers/starlineController');
+router.get('/starline/games', verifyAdmin, starlineController.getAdminGames);
+router.post('/starline/games', verifyAdmin, starlineController.addAdminGame);
+router.put('/starline/games/:id', verifyAdmin, starlineController.updateAdminGame);
+router.delete('/starline/games/:id', verifyAdmin, starlineController.deleteAdminGame);
+router.post('/starline/games/toggle', verifyAdmin, starlineController.toggleGameStatus);
+
+router.post('/starline/declare-result/preview', verifyAdmin, starlineController.previewWinners);
+router.post('/starline/declare-result', verifyAdmin, starlineController.declareResult);
+router.get('/starline/results', verifyAdmin, starlineController.getResultsList);
+router.get('/starline/results/:id/winners', verifyAdmin, starlineController.getWinnersForResult);
+router.delete('/starline/results/:id', verifyAdmin, starlineController.revertResult);
+
+router.get('/starline/bids', verifyAdmin, starlineController.getAdminBidHistory);
+router.post('/starline/bids', verifyAdmin, starlineController.addAdminBid);
+router.put('/starline/bids/:id', verifyAdmin, starlineController.updateAdminBid);
+router.delete('/starline/bids/:id', verifyAdmin, starlineController.deleteAdminBid);
+
+router.get('/starline/wins', verifyAdmin, starlineController.getAdminWinHistory);
+router.get('/starline/sell-report', verifyAdmin, starlineController.getAdminSellReport);
+router.get('/starline/rates', verifyAdmin, starlineController.getStarlineRates);
+router.post('/starline/rates', verifyAdmin, starlineController.updateStarlineRates);
+
 module.exports = router;
+

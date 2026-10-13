@@ -34,6 +34,19 @@ export default function GaliDesawarAdmin({ activeTab, setActiveTab }) {
   });
   const [revertingId, setRevertingId] = useState(null);
 
+  // Preview Winners Modal State
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
+  const [declaringLoading, setDeclaringLoading] = useState(false);
+
+  // Historical Winners Modal State
+  const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
+  const [winnerModalData, setWinnerModalData] = useState(null);
+
+  // Edit User Bid Modal State
+  const [isEditBidModalOpen, setIsEditBidModalOpen] = useState(false);
+  const [editingBid, setEditingBid] = useState(null);
+
   // 3. Bid History State
   const [bids, setBids] = useState([]);
   const [bidSummary, setBidSummary] = useState({ total_count: 0, total_points: 0, total_win_amount: 0 });
@@ -267,14 +280,14 @@ export default function GaliDesawarAdmin({ activeTab, setActiveTab }) {
     }
   };
 
-  // Handle Result Declaration
-  const handleDeclareResult = async (e) => {
-    e.preventDefault();
+  // Preview Winners Before Declaring
+  const handlePreviewWinners = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     setError('');
     setSuccess('');
 
     if (!declareForm.game_name || !declareForm.declare_result.trim()) {
-      setError('Please select game and enter a valid result');
+      setError('Please select game and enter a valid result (00-99)');
       return;
     }
 
@@ -284,25 +297,135 @@ export default function GaliDesawarAdmin({ activeTab, setActiveTab }) {
       return;
     }
 
-    if (!window.confirm(`Confirm Result Declaration:\nGame: ${declareForm.game_name}\nDate: ${declareForm.result_date}\nResult: ${val.padStart(2, '0')}\n\nWinners will be automatically credited.`)) {
-      return;
-    }
-
     try {
       setLoading(true);
-      const res = await api.post('/admin/gali-desawar/declare-result', {
-        ...declareForm,
+      const res = await api.post('/admin/gali-desawar/declare-result/preview', {
+        game_name: declareForm.game_name,
+        result_date: declareForm.result_date,
         declare_result: val.padStart(2, '0'),
       });
       if (res.data?.success === '1') {
+        setPreviewData(res.data.data);
+        setIsPreviewModalOpen(true);
+      } else {
+        setError(res.data?.msg || 'Failed to preview winners');
+      }
+    } catch (err) {
+      setError(err.response?.data?.msg || 'Failed to preview winners');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Result Declaration (Final submission with wallet payouts)
+  const handleDeclareResult = async () => {
+    if (!declareForm.game_name || !declareForm.declare_result.trim()) {
+      setError('Please select game and enter a valid result');
+      return;
+    }
+
+    const val = declareForm.declare_result.trim().padStart(2, '0');
+    if (!window.confirm(`Confirm Result Declaration:\nGame: ${declareForm.game_name}\nDate: ${declareForm.result_date}\nResult: ${val}\n\nAll winning user wallets will be credited automatically.`)) {
+      return;
+    }
+
+    setDeclaringLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const res = await api.post('/admin/gali-desawar/declare-result', {
+        game_name: declareForm.game_name,
+        result_date: declareForm.result_date,
+        declare_result: val,
+      });
+      if (res.data?.success === '1') {
         setSuccess(res.data.msg || 'Result declared successfully!');
+        setIsPreviewModalOpen(false);
         setDeclareForm((prev) => ({ ...prev, declare_result: '' }));
         fetchResults();
+        fetchBids();
       } else {
         setError(res.data?.msg || 'Failed to declare result');
       }
     } catch (err) {
       setError(err.response?.data?.msg || 'Error declaring result');
+    } finally {
+      setDeclaringLoading(false);
+    }
+  };
+
+  // View Winners for Historical Declared Result
+  const handleViewWinners = async (resItem) => {
+    try {
+      setLoading(true);
+      const res = await api.get(`/admin/gali-desawar/results/${resItem.id}/winners`);
+      if (res.data?.success === '1') {
+        setWinnerModalData(res.data.data);
+        setIsWinnerModalOpen(true);
+      } else {
+        setError(res.data?.msg || 'Failed to fetch winners');
+      }
+    } catch (err) {
+      setError('Failed to fetch winner details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Edit User Bid
+  const handleEditBid = async (e) => {
+    e.preventDefault();
+    if (!editingBid) return;
+    try {
+      setLoading(true);
+      const res = await api.put(`/admin/gali-desawar/bids/${editingBid.id}`, {
+        digit: editingBid.digit,
+        points: editingBid.points,
+        game_type: editingBid.game_type,
+        status: editingBid.status,
+      });
+      if (res.data?.success === '1') {
+        setSuccess('User bet updated successfully!');
+        setIsEditBidModalOpen(false);
+        setEditingBid(null);
+        fetchBids();
+        if (isPreviewModalOpen && declareForm.declare_result) {
+          handlePreviewWinners();
+        }
+      } else {
+        setError(res.data?.msg || 'Failed to update bet');
+      }
+    } catch (err) {
+      setError(err.response?.data?.msg || 'Error updating bet');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete User Bid
+  const handleDeleteBid = async (id, isFromPreview = false) => {
+    const refund = window.confirm(
+      'Do you want to REFUND the bet amount to the user wallet?\n\n[OK] = Refund points & Delete Bet\n[Cancel] = Continue to delete WITHOUT refund'
+    );
+    if (!refund && !window.confirm('Delete this bet WITHOUT refund?')) return;
+
+    try {
+      setLoading(true);
+      const res = await api.delete(`/admin/gali-desawar/bids/${id}`, {
+        data: { refund },
+      });
+      if (res.data?.success === '1') {
+        setSuccess('User bet deleted successfully.');
+        fetchBids();
+        if (isFromPreview || isPreviewModalOpen) {
+          handlePreviewWinners();
+        }
+      } else {
+        setError(res.data?.msg || 'Failed to delete bet');
+      }
+    } catch (err) {
+      setError('Failed to delete bet');
     } finally {
       setLoading(false);
     }
@@ -548,7 +671,7 @@ export default function GaliDesawarAdmin({ activeTab, setActiveTab }) {
               Declare New Result
             </h5>
 
-            <form onSubmit={handleDeclareResult} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', alignItems: 'end' }}>
+            <form onSubmit={handlePreviewWinners} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', alignItems: 'end' }}>
               {/* Game select */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: '#495057', marginBottom: '6px' }}>
@@ -620,9 +743,9 @@ export default function GaliDesawarAdmin({ activeTab, setActiveTab }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{ width: '100%', backgroundColor: '#34c38f', color: '#fff', border: 'none', padding: '12px 18px', borderRadius: '6px', fontWeight: '700', fontSize: '0.92rem', cursor: 'pointer', boxShadow: '0 2px 6px rgba(52,195,143,.3)' }}
+                  style={{ width: '100%', backgroundColor: '#556ee6', color: '#fff', border: 'none', padding: '12px 18px', borderRadius: '6px', fontWeight: '700', fontSize: '0.92rem', cursor: 'pointer', boxShadow: '0 2px 6px rgba(85,110,230,.3)' }}
                 >
-                  {loading ? 'Processing...' : '🚀 Declare Result & Pay'}
+                  {loading ? 'Analyzing Winners...' : '👁️ Preview Winners & Declare Result'}
                 </button>
               </div>
             </form>
@@ -719,14 +842,35 @@ export default function GaliDesawarAdmin({ activeTab, setActiveTab }) {
                           <td style={{ padding: '14px 18px', textAlign: 'center', color: '#74788d', fontSize: '0.8rem' }}>
                             {resItem.created_at ? new Date(resItem.created_at).toLocaleString('en-IN') : '—'}
                           </td>
-                          <td style={{ padding: '14px 18px', textAlign: 'center' }}>
-                            <button
-                              onClick={() => handleRevertResult(resItem.id, resItem.game_name, resItem.result_date ? String(resItem.result_date).slice(0, 10) : '')}
-                              disabled={revertingId === resItem.id}
-                              style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.78rem', fontWeight: '600' }}
-                            >
-                              {revertingId === resItem.id ? 'Reverting...' : '↺ Revert / Delete'}
-                            </button>
+                          <td style={{ padding: '14px 18px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                            <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
+                              <button
+                                onClick={() => handleViewWinners(resItem)}
+                                style={{
+                                  backgroundColor: '#eff6ff',
+                                  border: '1px solid #bfdbfe',
+                                  color: '#1d4ed8',
+                                  padding: '5px 12px',
+                                  borderRadius: '4px',
+                                  cursor: 'pointer',
+                                  fontSize: '0.78rem',
+                                  fontWeight: '700',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                }}
+                                title="View winning users for this result"
+                              >
+                                🏆 View Winners
+                              </button>
+                              <button
+                                onClick={() => handleRevertResult(resItem.id, resItem.game_name, resItem.result_date ? String(resItem.result_date).slice(0, 10) : '')}
+                                disabled={revertingId === resItem.id}
+                                style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.78rem', fontWeight: '600' }}
+                              >
+                                {revertingId === resItem.id ? 'Reverting...' : '↺ Revert / Delete'}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -857,6 +1001,7 @@ export default function GaliDesawarAdmin({ activeTab, setActiveTab }) {
                     <th style={{ padding: '14px 18px', textAlign: 'right' }}>Points</th>
                     <th style={{ padding: '14px 18px', textAlign: 'center' }}>Status</th>
                     <th style={{ padding: '14px 18px', textAlign: 'right' }}>Win Amount</th>
+                    <th style={{ padding: '14px 18px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -912,11 +1057,56 @@ export default function GaliDesawarAdmin({ activeTab, setActiveTab }) {
                         <td style={{ padding: '14px 18px', textAlign: 'right', fontWeight: '700', color: b.win_amount > 0 ? '#10b981' : '#74788d' }}>
                           {b.win_amount > 0 ? `+₹${Number(b.win_amount).toLocaleString()}` : '—'}
                         </td>
+                        <td style={{ padding: '14px 18px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                          <div style={{ display: 'inline-flex', gap: '6px', justifyContent: 'center' }}>
+                            <button
+                              onClick={() => {
+                                setEditingBid({
+                                  id: b.id,
+                                  username: b.username,
+                                  game_name: b.game_name,
+                                  game_type: b.game_type,
+                                  digit: b.digit,
+                                  points: b.points,
+                                  status: b.status || 'pending',
+                                });
+                                setIsEditBidModalOpen(true);
+                              }}
+                              style={{
+                                backgroundColor: '#f0fdf4',
+                                border: '1px solid #bbf7d0',
+                                color: '#15803d',
+                                padding: '5px 10px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                fontWeight: '600',
+                              }}
+                            >
+                              ✏️ Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteBid(b.id, false)}
+                              style={{
+                                backgroundColor: '#fef2f2',
+                                border: '1px solid #fecaca',
+                                color: '#dc2626',
+                                padding: '5px 10px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                fontWeight: '600',
+                              }}
+                            >
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="9" style={{ padding: '36px', textAlign: 'center', color: '#74788d' }}>
+                      <td colSpan="10" style={{ padding: '36px', textAlign: 'center', color: '#74788d' }}>
                         {loading ? 'Loading bids...' : 'No bids found for selected criteria.'}
                       </td>
                     </tr>
@@ -1438,6 +1628,361 @@ export default function GaliDesawarAdmin({ activeTab, setActiveTab }) {
                   style={{ backgroundColor: '#556ee6', color: '#fff', border: 'none', padding: '10px 22px', borderRadius: '6px', fontWeight: '700', cursor: 'pointer' }}
                 >
                   Update Game
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: PREVIEW WINNERS BEFORE DECLARING                                   */}
+      {/* ========================================================================= */}
+      {isPreviewModalOpen && previewData && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '16px' }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '100%', maxWidth: '840px', maxHeight: '88vh', display: 'flex', flexDirection: 'column', boxShadow: '0 1rem 3rem rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+            {/* Header */}
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid #eff2f7', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '1.2rem', color: '#1e293b', fontWeight: '800' }}>
+                  🎯 Preview Winners: {declareForm.game_name}
+                </h4>
+                <div style={{ display: 'flex', gap: '14px', marginTop: '6px', fontSize: '0.85rem', color: '#64748b', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span>Date: <strong style={{ color: '#1e293b' }}>{declareForm.result_date}</strong></span>
+                  <span>•</span>
+                  <span>
+                    Winning Result: <span style={{ backgroundColor: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '6px', fontWeight: '800', border: '1px solid #fde68a' }}>{previewData.declared_result}</span>
+                    &nbsp;(Left Haruf: <strong>{previewData.left_digit}</strong>, Right Haruf: <strong>{previewData.right_digit}</strong>)
+                  </span>
+                </div>
+              </div>
+              <button onClick={() => setIsPreviewModalOpen(false)} style={{ border: 'none', background: 'none', fontSize: '1.3rem', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
+            </div>
+
+            {/* Scrollable Body */}
+            <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
+              {/* Summary Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '22px' }}>
+                <div style={{ backgroundColor: '#f8fafc', padding: '14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>Total Bets Analyzed</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a', marginTop: '4px' }}>{previewData.total_bids}</div>
+                </div>
+                <div style={{ backgroundColor: '#ecfdf5', padding: '14px', borderRadius: '8px', border: '1px solid #a7f3d0', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#059669', fontWeight: '700', textTransform: 'uppercase' }}>Eligible Winners</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: '800', color: '#047857', marginTop: '4px' }}>{previewData.winners_count}</div>
+                </div>
+                <div style={{ backgroundColor: '#eff6ff', padding: '14px', borderRadius: '8px', border: '1px solid #bfdbfe', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '700', textTransform: 'uppercase' }}>Total Payout Liability</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: '800', color: '#1d4ed8', marginTop: '4px' }}>₹{Number(previewData.total_winning_amount || 0).toLocaleString()}</div>
+                </div>
+              </div>
+
+              {/* Winners Table Header & Info */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h5 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#334155' }}>
+                  🏆 Matching Winning Users ({previewData.winners?.length || 0})
+                </h5>
+                <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                  You can edit or delete/refund user bets directly below before final declaration.
+                </span>
+              </div>
+
+              {previewData.winners?.length === 0 ? (
+                <div style={{ backgroundColor: '#f8fafc', padding: '36px', borderRadius: '8px', textAlign: 'center', border: '1px dashed #cbd5e1' }}>
+                  <div style={{ fontSize: '1.6rem', marginBottom: '6px' }}>🤷‍♂️</div>
+                  <div style={{ fontWeight: '600', color: '#475569' }}>No winning bets for this result number!</div>
+                  <div style={{ fontSize: '0.82rem', color: '#94a3b8', marginTop: '4px' }}>Total Payout to users will be ₹0. All bets for this game session will be settled as Loss.</div>
+                </div>
+              ) : (
+                <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569' }}>
+                        <th style={{ padding: '10px 12px', textAlign: 'left' }}>#</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'left' }}>User Phone</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'left' }}>Bet Type</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'center' }}>Digit</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'right' }}>Points</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'center' }}>Rate</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'right' }}>Win Payout</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'center' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {previewData.winners.map((w, idx) => (
+                        <tr key={w.bid_id || idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '10px 12px', color: '#94a3b8' }}>{idx + 1}</td>
+                          <td style={{ padding: '10px 12px', fontWeight: '700', color: '#1e293b' }}>{w.username}</td>
+                          <td style={{ padding: '10px 12px' }}>
+                            <span style={{ backgroundColor: w.game_type?.toLowerCase().includes('jodi') ? '#fef3c7' : '#e0e7ff', color: w.game_type?.toLowerCase().includes('jodi') ? '#92400e' : '#3730a3', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700' }}>
+                              {w.game_type}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                            <span style={{ backgroundColor: '#f1f5f9', color: '#0f172a', padding: '2px 8px', borderRadius: '4px', fontWeight: '800' }}>
+                              {w.digit}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: '600' }}>₹{Number(w.points).toLocaleString()}</td>
+                          <td style={{ padding: '10px 12px', textAlign: 'center', color: '#059669', fontWeight: '700' }}>{w.multiplier}x</td>
+                          <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: '800', color: '#10b981' }}>
+                            +₹{Number(w.win_amount).toLocaleString()}
+                          </td>
+                          <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                            <div style={{ display: 'inline-flex', gap: '4px' }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingBid({
+                                    id: w.bid_id,
+                                    username: w.username,
+                                    game_name: w.game_name,
+                                    game_type: w.game_type,
+                                    digit: w.digit,
+                                    points: w.points,
+                                    status: 'pending',
+                                  });
+                                  setIsEditBidModalOpen(true);
+                                }}
+                                style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#15803d', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.74rem', fontWeight: '600' }}
+                                title="Edit bet"
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteBid(w.bid_id, true)}
+                                style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.74rem', fontWeight: '600' }}
+                                title="Delete & refund bet"
+                              >
+                                🗑️ Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div style={{ padding: '16px 24px', borderTop: '1px solid #eff2f7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ fontSize: '0.82rem', color: '#64748b' }}>
+                Ready to publish result <strong>{previewData.declared_result}</strong> for {declareForm.game_name}?
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsPreviewModalOpen(false)}
+                  style={{ padding: '9px 18px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  Close Preview
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeclareResult}
+                  disabled={declaringLoading}
+                  style={{ padding: '9px 24px', borderRadius: '6px', background: '#34c38f', color: '#fff', border: 'none', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer', boxShadow: '0 2px 6px rgba(52,195,143,.35)' }}
+                >
+                  {declaringLoading ? 'Declaring & Paying...' : '🚀 Confirm & Declare Result & Pay'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: VIEW WINNERS FOR HISTORICAL DECLARED RESULT                        */}
+      {/* ========================================================================= */}
+      {isWinnerModalOpen && winnerModalData && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '16px' }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '100%', maxWidth: '780px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 1rem 3rem rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid #eff2f7', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '1.2rem', color: '#1e293b', fontWeight: '800' }}>
+                  🏆 Winners: {winnerModalData.result?.game_name}
+                </h4>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '4px', fontSize: '0.84rem', color: '#64748b', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span>Date: <strong style={{ color: '#1e293b' }}>{winnerModalData.result?.result_date ? String(winnerModalData.result?.result_date).slice(0, 10) : ''}</strong></span>
+                  <span>•</span>
+                  <span>
+                    Declared Result: <span style={{ backgroundColor: '#fef3c7', color: '#92400e', padding: '2px 8px', borderRadius: '6px', fontWeight: '800' }}>{winnerModalData.result?.declare_result}</span>
+                    &nbsp;(Left Haruf: <strong>{winnerModalData.result?.left_digit || winnerModalData.result?.declare_result?.[0]}</strong>, Right Haruf: <strong>{winnerModalData.result?.right_digit || winnerModalData.result?.declare_result?.[1]}</strong>)
+                  </span>
+                </div>
+              </div>
+              <button onClick={() => setIsWinnerModalOpen(false)} style={{ border: 'none', background: 'none', fontSize: '1.3rem', cursor: 'pointer', color: '#94a3b8' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '20px 24px', overflowY: 'auto', flex: 1 }}>
+              {winnerModalData.winners?.length === 0 ? (
+                <div style={{ padding: '36px', textAlign: 'center', color: '#64748b' }}>
+                  <div style={{ fontSize: '1.5rem', marginBottom: '6px' }}>📭</div>
+                  <div>No winning records found for this declared result.</div>
+                </div>
+              ) : (
+                <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569' }}>
+                        <th style={{ padding: '10px 12px', textAlign: 'left' }}>#</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'left' }}>User Phone</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'left' }}>Bet Type</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'center' }}>Winning Digit</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'right' }}>Bet Points</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'right' }}>Winning Points (₹)</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'center' }}>Settled At</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {winnerModalData.winners.map((w, idx) => (
+                        <tr key={w.id || idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '10px 12px', color: '#94a3b8' }}>{idx + 1}</td>
+                          <td style={{ padding: '10px 12px', fontWeight: '700', color: '#0f172a' }}>{w.username}</td>
+                          <td style={{ padding: '10px 12px' }}>
+                            <span style={{ backgroundColor: '#eff6ff', color: '#1d4ed8', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700' }}>
+                              {w.game_type}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                            <span style={{ backgroundColor: '#f1f5f9', color: '#0f172a', padding: '2px 8px', borderRadius: '4px', fontWeight: '800' }}>
+                              {w.digit}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: '600' }}>
+                            ₹{Number(w.points_action || 0).toLocaleString()}
+                          </td>
+                          <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: '800', color: '#10b981' }}>
+                            +₹{Number(w.winning_points || 0).toLocaleString()}
+                          </td>
+                          <td style={{ padding: '10px 12px', textAlign: 'center', color: '#64748b', fontSize: '0.78rem' }}>
+                            {w.created_at ? new Date(w.created_at).toLocaleString('en-IN') : w.date || '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div style={{ padding: '14px 24px', borderTop: '1px solid #eff2f7', display: 'flex', justifyContent: 'flex-end', backgroundColor: '#f8fafc' }}>
+              <button
+                type="button"
+                onClick={() => setIsWinnerModalOpen(false)}
+                style={{ padding: '8px 20px', borderRadius: '6px', background: '#556ee6', color: '#fff', border: 'none', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: EDIT USER BET                                                      */}
+      {/* ========================================================================= */}
+      {isEditBidModalOpen && editingBid && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: '16px' }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: '12px', width: '100%', maxWidth: '480px', padding: '24px', boxShadow: '0 1rem 3rem rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+              <h5 style={{ margin: 0, fontSize: '1.15rem', color: '#2a3042', fontWeight: '700' }}>
+                ✏️ Edit User Bet #{editingBid.id}
+              </h5>
+              <button onClick={() => setIsEditBidModalOpen(false)} style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#74788d' }}>✕</button>
+            </div>
+
+            <form onSubmit={handleEditBid} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: '#495057', marginBottom: '4px' }}>User Phone</label>
+                <input
+                  type="text"
+                  disabled
+                  value={editingBid.username}
+                  style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', background: '#f8fafc', color: '#64748b' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: '#495057', marginBottom: '4px' }}>Game Market</label>
+                <input
+                  type="text"
+                  disabled
+                  value={editingBid.game_name}
+                  style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', background: '#f8fafc', color: '#64748b' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: '#495057', marginBottom: '4px' }}>Bet Type</label>
+                <select
+                  value={editingBid.game_type}
+                  onChange={(e) => setEditingBid({ ...editingBid, game_type: e.target.value })}
+                  style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '6px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                >
+                  <option value="Left Digit">Left Digit (अंदर)</option>
+                  <option value="Right Digit">Right Digit (बाहर)</option>
+                  <option value="Jodi Digit">Jodi Digit (जोड़ी)</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: '#495057', marginBottom: '4px' }}>
+                    {editingBid.game_type?.toLowerCase().includes('jodi') ? 'Digit (00-99)' : 'Digit (0-9)'}
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={editingBid.game_type?.toLowerCase().includes('jodi') ? 2 : 1}
+                    value={editingBid.digit || ''}
+                    onChange={(e) => setEditingBid({ ...editingBid, digit: e.target.value.replace(/[^0-9]/g, '') })}
+                    required
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '6px', border: '1px solid #ced4da', fontSize: '0.9rem', textAlign: 'center', fontWeight: '700' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: '#495057', marginBottom: '4px' }}>Points (₹)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={editingBid.points || ''}
+                    onChange={(e) => setEditingBid({ ...editingBid, points: e.target.value })}
+                    required
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '6px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: '#495057', marginBottom: '4px' }}>Status</label>
+                <select
+                  value={editingBid.status || 'pending'}
+                  onChange={(e) => setEditingBid({ ...editingBid, status: e.target.value })}
+                  style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '6px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="win">Win</option>
+                  <option value="loss">Loss</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsEditBidModalOpen(false)}
+                  style={{ backgroundColor: '#f1f5f9', color: '#475569', border: 'none', padding: '9px 16px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{ backgroundColor: '#556ee6', color: '#fff', border: 'none', padding: '9px 20px', borderRadius: '6px', fontWeight: '700', cursor: 'pointer' }}
+                >
+                  {loading ? 'Saving...' : 'Update Bet'}
                 </button>
               </div>
             </form>
