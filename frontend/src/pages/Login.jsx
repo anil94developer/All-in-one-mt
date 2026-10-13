@@ -236,6 +236,22 @@ const Login = ({ setAuth }) => {
               SignUp Here
             </Link>
           </div>
+
+          <div style={{ marginTop: '16px', textAlign: 'center', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <Link 
+              to="/admin/login" 
+              style={{ 
+                color: 'rgba(255, 255, 255, 0.45)', 
+                fontSize: '0.82rem',
+                textDecoration: 'none', 
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.9)'}
+              onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.45)'}
+            >
+              🔐 Admin Portal Login →
+            </Link>
+          </div>
         </div>
       </div>
     </div>

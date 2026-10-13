@@ -1,16 +1,35 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { NativeModules, Platform } from "react-native";
 
-// Recognized host options: localhost (adb reverse / iOS), LAN IP (Physical Device Wi-Fi), 10.0.2.2 (Android Emulator)
-const KNOWN_HOSTS = [
+// Helper to dynamically extract the host IP from Metro scriptURL
+const getMetroHost = () => {
+  try {
+    const scriptURL = NativeModules?.SourceCode?.scriptURL;
+    if (scriptURL) {
+      const match = scriptURL.match(/^https?:\/\/([^:/]+)/);
+      if (match && match[1] && match[1] !== 'localhost' && match[1] !== '127.0.0.1') {
+        return `http://${match[1]}:5001`;
+      }
+    }
+  } catch (e) {}
+  return null;
+};
+
+const dynamicMetroHost = getMetroHost();
+
+// Recognized host options: Metro host, current LAN IP, localhost, emulator IP
+const KNOWN_HOSTS = Array.from(new Set([
+  ...(dynamicMetroHost ? [dynamicMetroHost] : []),
+  'http://10.136.70.89:5001',
   'http://localhost:5001',
+  'http://10.0.2.2:5001',
   'http://10.48.241.89:5001',
   'http://10.62.158.89:5001',
-  'http://10.0.2.2:5001',
   'http://192.168.2.1:5001',
-];
+]));
 
-let activeHost = null;
+let activeHost = dynamicMetroHost || (Platform.OS === 'android' ? 'http://10.136.70.89:5001' : 'http://localhost:5001');
 
 const getActiveHost = () => activeHost;
 const setActiveHost = (host) => {

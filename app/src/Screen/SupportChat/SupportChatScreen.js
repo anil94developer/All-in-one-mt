@@ -47,10 +47,10 @@ import {
 
 // Candidate backend hosts for resilient connectivity on physical devices & emulators
 const CANDIDATE_HOSTS = [
+  'http://10.136.70.89:5001',
   'http://localhost:5001',
-  'http://10.62.158.89:5001',
-  'http://192.168.2.1:5001',
   'http://10.0.2.2:5001',
+  'http://192.168.2.1:5001',
 ];
 
 const resolveMediaUrl = (url, activeHostUrl) => {
@@ -58,7 +58,7 @@ const resolveMediaUrl = (url, activeHostUrl) => {
   if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('file://')) {
     return url;
   }
-  const currentHost = getActiveHost() || activeHostUrl || (Platform.OS === 'android' ? 'http://10.62.158.89:5001' : domainUrl);
+  const currentHost = getActiveHost() || activeHostUrl || domainUrl;
   if (url.startsWith('http://') || url.startsWith('https://')) {
     if (url.includes('localhost:5001') && currentHost && !currentHost.includes('localhost')) {
       return url.replace('http://localhost:5001', currentHost);
@@ -517,7 +517,7 @@ export default function SupportChatScreen(props) {
 
   const [currentUser, setCurrentUser] = useState({ phone: '9966322889', name: 'User', id: '1' });
   const [activeHostUrl, setActiveHostUrl] = useState(
-    getActiveHost() || (Platform.OS === 'android' ? 'http://10.62.158.89:5001' : domainUrl)
+    getActiveHost() || domainUrl
   );
   const [socketConnected, setSocketConnected] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -632,7 +632,7 @@ export default function SupportChatScreen(props) {
       setActiveHost(fastest);
       return fastest;
     } catch (e) {
-      const fallback = Platform.OS === 'android' ? 'http://10.62.158.89:5001' : domainUrl;
+      const fallback = getActiveHost() || domainUrl;
       console.log('[SupportChat] Fallback to host:', fallback);
       setActiveHost(fallback);
       return fallback;

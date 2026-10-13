@@ -1,12 +1,28 @@
 /* eslint-disable prettier/prettier */
-import { Platform } from 'react-native';
+import { Platform, NativeModules } from 'react-native';
 
 // const GOOGLE_MAPS_APIKEY = 'AIzaSyCnNf6kIq3DO1pSmHlP3qlehZgeaibm4oM';
 const GOOGLE_MAPS_APIKEY = 'AIzaSyArqlT_3Q9fHcisw6lvvUGTcObXGz3GEJk';
 
+// Helper to dynamically extract the host IP from Metro scriptURL (e.g. 'http://10.136.70.89:8081/...')
+const getDevServerHost = () => {
+  try {
+    const scriptURL = NativeModules?.SourceCode?.scriptURL;
+    if (scriptURL) {
+      const match = scriptURL.match(/^https?:\/\/([^:/]+)/);
+      if (match && match[1] && match[1] !== 'localhost' && match[1] !== '127.0.0.1') {
+        return match[1];
+      }
+    }
+  } catch (e) {
+    // fallback
+  }
+  return null;
+};
+
 // Host machine server URLs for Physical Device & Android Emulator
-const DEV_LAN_IP = '10.48.241.89'; // Your Computer LAN IP
-const domainUrl = Platform.OS === 'android' ? 'http://localhost:5001' : 'http://localhost:5001';
+const DEV_LAN_IP = getDevServerHost() || '10.136.70.89';
+const domainUrl = Platform.OS === 'android' ? `http://${DEV_LAN_IP}:5001` : 'http://localhost:5001';
 const fallbackUrl = `http://${DEV_LAN_IP}:5001`;
 
 const mainUrl = domainUrl + '/api/';

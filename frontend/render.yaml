@@ -1,0 +1,9 @@
+services:
+  - type: static
+    name: all-in-one-mt-frontend-and-admin
+    buildCommand: npm run build
+    publishDir: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
